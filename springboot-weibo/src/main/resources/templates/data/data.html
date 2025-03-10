@@ -1,0 +1,99 @@
+﻿<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<meta charset="utf-8">
+	<title>index</title>
+	<script type="text/javascript" th:src="@{/data/js/jquery.js}"></script>
+	<script type="text/javascript" th:src="@{/data/js/echarts.min.js}"></script>
+	<script type="text/javascript" th:src="@{/data/js/china.js}"></script>
+	<script type="text/javascript" th:src="@{/data/js/map.js}"></script>
+	<script type="text/javascript" th:src="@{/data/js/echarts-wordcloud.min.js}"></script>
+	<link rel="stylesheet" th:href="@{/data/css/style.css}">
+</head>
+
+<body>
+	<div class="head clearfix">
+		<p class="pulll_left" style="text-align: center"><h1>基于微博的用户数据分析系统</h1></p>
+<!--		<div class="menu menu2 pulll_left">-->
+<!--			<ul>-->
+<!--				<li><a href="#">首页</a></li>-->
+<!--				<li><a href="#">苹果</a></li>-->
+<!--				<li><a href="#">oppo</a></li>-->
+<!--				<li><a href="#">vivo</a></li>-->
+<!--				<li><a href="#">华为</a></li>-->
+<!--				<li><a href="#">三星</a></li>-->
+<!--			</ul>-->
+<!--		</div>-->
+		<div class="time" id="showTime">2018/6/12 17:00:12</div>
+	</div>
+	<div class="mainbox">
+
+		<ul class="clearfix nav1">
+			<li style="width: 22%">
+				<div class="box">
+					<div class="tit">地区活跃人数热度排行榜</div>
+					<div class="boxnav" style="height: 400px;">
+						<div class="" style="height: 406px" id="echart2"></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="tit">用户手机品牌使用量及排行榜</div>
+					<div class="boxnav" style="height: 400px;">
+						<div class="" style="height: 406px" id="echart7"></div>
+					</div>
+				</div>
+			</li>
+			<li style="width: 56%">
+
+				<div class="box">
+					<div class="boxnav mapc" style="height: 550px; position: relative">
+						<div class="tit" style="text-align: center">国内用户活跃度情况</div>
+						<div class="map" id="map"></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="tit">微博用户活跃时间段统计</div>
+					<div class="boxnav" style="height: 290px;" id="echart3">
+					</div>
+				</div>
+			</li>
+			<li style="width: 22%">
+				<div class="box">
+					<div class="tit">全部用户微博感兴趣话题</div>
+					<div class="boxnav" id="echart4" style="height: 500px;">
+
+					</div>
+				</div>
+				<div class="box">
+					<div class="tit">微博用户男女年龄段占比</div>
+					<div class="boxnav" style="height: 300px;" id="echart6">
+					</div>
+				</div>
+
+			</li>
+		</ul>
+
+		<script type="text/javascript" th:src="@{/data/js/js.js}"></script>
+
+		<script>
+			var t = null;
+			t = setTimeout(time, 1000);//開始运行
+			function time() {
+				clearTimeout(t);//清除定时器
+				dt = new Date();
+				var y = dt.getFullYear();
+				var mt = dt.getMonth() + 1;
+				var day = dt.getDate();
+				var h = dt.getHours();//获取时
+				var m = dt.getMinutes();//获取分
+				var s = dt.getSeconds();//获取秒
+				document.getElementById("showTime").innerHTML = y + "/" + mt + "/" + day + " " + h + ":" + m + ":" + s + "";
+				t = setTimeout(time, 1000); //设定定时器，循环运行     
+			}
+
+		</script>
+	</div>
+</body>
+
+</html>

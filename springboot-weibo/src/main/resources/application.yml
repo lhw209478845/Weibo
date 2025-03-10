@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/weibo?serverTimezone=UTC&useSSL=false&characterEncoding=utf-8
+    driver-class-name: com.mysql.jdbc.Driver 
+
+#shiro的配置路径
+#shiro的配置
+shiro:
+  anon-urls:
+    - /toLogin*
+    - /login.html*
+    - /login/login
+    - /login/getCode
+    - /css/**
+    - /echarts/**
+    - /images/**
+    - /layui/**
+    - /layui_ext/**
+    - /js/**
+  login-url: /index.html
+  log-out-url: /login/logout*
+  authc-ulrs:
+    - /**
+
+Ceps:
+  path: D:\CepsImg\User
+server:
+  port: 8080

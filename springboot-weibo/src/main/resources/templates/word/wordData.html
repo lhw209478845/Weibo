@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <!-- 引入刚刚下载的 ECharts 文件 -->
+    <script th:src="@{/echarts/echarts.min.js}"></script>
+    <script th:src="@{/echarts/china.js}"></script>
+    <script th:src="@{/echarts/jquery-1.11.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"  media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+    <script th:src="@{/echarts/echarts-wordcloud.min.js}"></script>
+</head>
+<body class="childrenBody">
+
+
+<div>
+    <div class="layui-bg-gray" style="padding: 30px;">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md4">
+                <h1 align="center"></h1>
+                <div class="layui-panel">
+                    <div style="padding-top: 10px">
+                        <ul class="layui-timeline">
+                            <p style="text-align: center; font-size: large; font-weight: bolder">Top5热点话题</p>
+                            <li th:each="word : ${wordList5}" class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis"></i>
+                                <div class="layui-timeline-content layui-text">
+                                    <p>
+                                        <br><span class="layui-badge layui-bg-blue">话题名称：</span><span th:text="${word.name}"></span>
+                                        <br><span class="layui-badge layui-bg-orange">话题关注度：</span><span th:text="${word.value}"></span>
+                                        <br><span class="layui-badge layui-bg-green">话题链接地址：</span><a th:href="${word.link}"><span th:text="${word.link}"></span></a>
+                                        <br><span class="layui-badge layui-bg-green">话题相关图片:</span><img th:src="${word.img}" alt="图片暂时不能显示" width="30%" height="30%">
+
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis"></i>
+                                <div class="layui-timeline-content layui-text">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md8">
+                <h1 align="center">微博热点话题分析</h1>
+                <div id="main2" style="width: 100%;height:600px;"></div>
+                <div id="main" style="width: 100%;height:550px;"></div>
+                <br>
+            </div>
+
+        </div>
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <h1 align="center"></h1>
+                <div class="layui-panel">
+                    <div style="padding-top: 10px">
+                        <ul class="layui-timeline">
+                            <p style="text-align: center; font-size: large; font-weight: bolder">所有热点话题</p>
+                            <li th:each="words : ${wordList}" class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis"></i>
+                                <div class="layui-timeline-content layui-text">
+                                    <p>
+                                        <br><span class="layui-badge layui-bg-blue">话题名称：</span><span th:text="${words.name}"></span>
+                                        <br><span class="layui-badge layui-bg-orange">话题关注度：</span><span th:text="${words.value}"></span>
+                                        <br><span class="layui-badge layui-bg-green">话题链接地址：</span><a th:href="${words.link}"><span th:text="${words.link}"></span></a>
+                                        <br><span class="layui-badge layui-bg-green">话题相关图片:</span><img th:src="${words.img}" alt="图片暂时不能显示" width="30%" height="30%">
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis"></i>
+                                <div class="layui-timeline-content layui-text">
+                                    <div class="layui-timeline-title">过去</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    var myChart2 = echarts.init(document.getElementById('main2'));
+    var dataList = [
+           {value: 3961, name: '衣服'},
+           {value: 2182, name: '房子'},
+           {value: 1828, name: '公司'},
+           {value: 1660, name: '复联'},
+           {value: 1578, name: '北京'},
+           {value: 1445, name: '街舞'},
+           {value: 1352, name: '监控'},
+           {value: 1345, name: '吃饭'},
+           {value: 1138, name: '手机'},
+           {value: 1078, name: '口罩'},
+            {value: 949, name: '日本'},
+             {value: 893, name: '垃圾'},
+             {value: 841, name: '电影'},
+             {value: 731, name: '年薪'},
+             {value: 711, name: '游戏'},
+             {value: 646, name: '内裤'},
+             {value: 646, name: '加拿大'},
+             {value: 637, name: '武汉'},
+             {value: 614, name: '照片'},
+             {value: 578, name: '好吃'},
+    ];
+
+    option = {
+        title: {
+            text: '热点话题Top20饼状图'
+        },
+        color: ['#37a2da', '#32c5e9', '#9fe6b8', '#ffdb5c', '#ff9f7f', '#fb7293', '#e7bcf3', '#8378ea'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)',
+        },
+        toolbox: {
+            show: true,
+        },
+        legend: {
+            x: '75%', //水平位置，【left\center\right\数字】
+            y: '350', //垂直位置，【top\center\bottom\数字】
+            align: 'left', //字在图例的左边或右边【left/right】
+            orient: 'vertical', //图例方向【horizontal/vertical】
+            icon: 'circle', //图例形状【circle\rect\roundRect\triangle\diamond\pin\arrow\none】
+            textStyle: {
+                color: '#8C8C8C',
+            },
+            // height:150
+        },
+        series: [
+            {
+                name: '微博热词',
+                type: 'pie',
+                radius: [0, 150],
+                data: dataList,
+            },
+        ],
+    };
+
+    $.ajax({
+        url: "/word/queryWord10",
+        dataType: "json",
+        success: function (item){
+            for(let i in item){
+                dataList.push(item[i]);
+            }
+        }
+    });
+
+    console.log(dataList)
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+
+    var JosnList = [];
+
+
+    option2 = {
+        title: {
+            text: '热点话题词云图'
+        },
+        tooltip: {
+            show: true,
+            // formatter: (params) => {
+            //     const { name, value } = params;
+            //     return `${name}:${value}`;
+            // },
+        },
+
+        series: [
+            {
+                type: 'wordCloud',
+                //size: ['9%', '99%'],
+                sizeRange: [14, 50],
+                //textRotation: [0, 45, 90, -45],
+                rotationRange: [-45, 90],
+                shape: 'circle',
+                textPadding: 0,
+                width: '80%',
+                // 画布高
+                height: '80%',
+                autoSize: {
+                    enable: true,
+                    minSize: 6,
+                },
+                textStyle: {
+                    normal: {
+                        color: function () {
+                            return (
+                                'rgb(' +
+                                [Math.round(Math.random() * 256), Math.round(Math.random() * 256), Math.round(Math.random() * 256)].join(
+                                    ','
+                                ) +
+                                ')'
+                            );
+                        },
+                    },
+                    emphasis: {
+                        shadowBlur: 2,
+                        shadowColor: '#333',
+                    },
+                },
+                data: JosnList,
+            },
+        ],
+    };
+
+    $.ajax({
+        url: "/word/queryAllWord",
+        dataType: "json",
+        success: function (data) {
+            for(let i in data){
+                JosnList.push(data[i]);
+            }
+            myChart2.setOption(option2);
+        }
+    });
+
+    // console.log(JosnList)
+    //JS
+    layui.use(['carousel', 'element', 'layer', 'util'], function(){
+        var element = layui.element
+            ,layer = layui.layer
+            ,carousel = layui.carousel
+            ,util = layui.util
+            ,$ = layui.$;
+
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function(othis){
+                layer.msg('展开左侧菜单的操作', {icon: 0});
+            }
+            ,menuRight: function(){
+                layer.open({
+                    type: 1
+                    ,content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                    ,area: ['260px', '100%']
+                    ,offset: 'rt' //右上角
+                    ,anim: 5
+                    ,shadeClose: true
+                });
+            }
+        });
+
+        //常规轮播
+        carousel.render({
+            elem: '#test1'
+            ,arrow: 'always'
+            ,height: '200px'
+            ,width: '350px'
+        });
+
+    });
+</script>
+</body>
+</html>

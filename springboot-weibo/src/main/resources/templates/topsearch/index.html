@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <!-- 引入刚刚下载的 ECharts 文件 -->
+    <script th:src="@{/echarts/echarts.min.js}"></script>
+    <script th:src="@{/echarts/china.js}"></script>
+    <script th:src="@{/echarts/jquery-1.11.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"  media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+    <script th:src="@{/layui/layui.js}" charset="utf-8"></script>
+    <script th:src="@{/echarts/echarts-wordcloud.min.js}"></script>
+</head>
+<body class="childrenBody">
+
+
+<div>
+    <div class="layui-bg-gray" style="padding: 30px;">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md4">
+                <h1 align="center">实时热搜微博Top10</h1>
+                <div class="layui-panel">
+                    <!--轮播图-->
+                    <div class="layui-carousel" id="test1" lay-filter="test1">
+                        <div carousel-item="">
+                            <div><img style="width: 100%; height: 100%" th:src="@{/images/weibo1.jpg}"></div>
+                            <div><img style="width: 100%; height: 100%" th:src="@{/images/weibo2.jpg}"></div>
+                            <div><img style="width: 100%; height: 100%" th:src="@{/images/weibo3.jpg}"></div>
+                            <div><img style="width: 100%; height: 100%" th:src="@{/images/weibo4.jpg}"></div>
+                        </div>
+                    </div>
+                    <!--新闻数据-->
+                    <div style="padding-top: 10px">
+                        <ul class="layui-timeline">
+                            <li th:each="topSearch : ${topSearchList}" class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis"></i>
+                                <div class="layui-timeline-content layui-text">
+                                    <h3 class="layui-timeline-title" th:text="${#dates.format(topSearch.createTime,'yyyy-MM-dd HH:ss')}">8月15日</h3>
+                                    <p>
+                                        <br><span class="layui-badge layui-bg-blue">微博属性：</span><span th:text="${topSearch.appear}"></span>
+                                        <br><span class="layui-badge layui-bg-orange">微博热度：</span><span th:text="${topSearch.contentHeat}"></span>
+                                        <br><span class="layui-badge layui-bg-green">微博内容：</span><span th:text="${topSearch.content}"></span>
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis"></i>
+                                <div class="layui-timeline-content layui-text">
+                                    <div class="layui-timeline-title">过去</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md8">
+                <h1 align="center">热搜微博领域分析</h1>
+                <div id="main2" style="width: 100%;height:600px;"></div>
+                <div id="main" style="width: 100%;height:600px;"></div>
+                <div id="main1" style="width: 100%;height:600px;"></div>
+                <br>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+    var myChart1 = echarts.init(document.getElementById('main1'));
+    var myChart2 = echarts.init(document.getElementById('main2'));
+    var dataList = [
+        { value: Math.floor(2324)+1241, name: '娱乐' },
+        { value: Math.floor(1232)+723, name: '政治' },
+        { value: Math.floor(1443)+634, name: '军事' },
+        { value: Math.floor(1323)+652, name: '经济' },
+        { value: Math.floor(1523)+623, name: '体育' },
+        { value: Math.floor(1223)+802, name: '动漫' },
+        { value: Math.floor(2243)+1234, name: '其它' },
+    ];
+
+    option = {
+        title: {
+            text: '热搜微博饼状图'
+        },
+        color: ['#37a2da', '#32c5e9', '#9fe6b8', '#ffdb5c', '#ff9f7f', '#fb7293', '#e7bcf3', '#8378ea'],
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)',
+        },
+        toolbox: {
+            show: true,
+        },
+        legend: {
+            x: '80%', //水平位置，【left\center\right\数字】
+            y: '350', //垂直位置，【top\center\bottom\数字】
+            align: 'left', //字在图例的左边或右边【left/right】
+            orient: 'vertical', //图例方向【horizontal/vertical】
+            icon: 'circle', //图例形状【circle\rect\roundRect\triangle\diamond\pin\arrow\none】
+            textStyle: {
+                color: '#8C8C8C',
+            },
+            // height:150
+        },
+        series: [
+            {
+                name: '微博热搜',
+                type: 'pie',
+                radius: [0, 150],
+                data: dataList
+            },
+        ],
+    };
+
+    // $.ajax({
+    //     url: "/topsearch/query",
+    //     dataType: "json",
+    //     success: function (data){
+    //         for(let i in data){
+    //             dataList[i] = data[i];
+    //         }
+    //         myChart.setOption({
+    //             series: [
+    //                 {
+    //                     name: '微博热搜',
+    //                     type: 'pie',
+    //                     radius: [0, 150],
+    //                     data: [
+    //                         { value: Math.floor(2000)+1200, name: '娱乐' },
+    //                         { value: Math.floor(1200)+700, name: '政治' },
+    //                         { value: Math.floor(1400)+600, name: '军事' },
+    //                         { value: Math.floor(1300)+600, name: '经济' },
+    //                         { value: Math.floor(1500)+600, name: '体育' },
+    //                         { value: Math.floor(1200)+800, name: '动漫' },
+    //                         { value: Math.floor(2000)+1000, name: '其它' },
+    //                     ],
+    //                 },
+    //             ],
+    //         })
+    //     }
+    // });
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+
+    option1 = {
+        title: {
+            text: '微博时间段热度'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        legend: {
+            data: ['娱乐', '军事', '政治', '其它', '动漫', '经济', '体育']
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: false,
+                data: ['0:00', '3:00', '6:00', '9:00', '12:00', '15:00', '18:00', '21:00']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value'
+            }
+        ],
+        series: [
+            {
+                name: '娱乐',
+                type: 'line',
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [Math.floor(1324)+241, Math.floor(1324)+441, Math.floor(1324)+441, Math.floor(1324)+441, Math.floor(1324)+441, Math.floor(2024)+1241, Math.floor(2124)+1241, Math.floor(2124)+1241]
+            },
+            {
+                name: '动漫',
+                type: 'line',
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [Math.floor(1324)+241, Math.floor(1324)+441, Math.floor(2124)+1141, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2124)+1241]
+            },
+            {
+                name: '经济',
+                type: 'line',
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [Math.floor(1424)+241, Math.floor(1324)+441, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2324)+1241, Math.floor(2124)+1241]
+            },
+            {
+                name: '军事',
+                type: 'line',
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [Math.floor(1334)+251, Math.floor(1334)+451, Math.floor(2326)+1211, Math.floor(2234)+1641, Math.floor(3324)+1271, Math.floor(3364)+2241, Math.floor(1324)+1141, Math.floor(2124)+1241]
+            },
+            {
+                name: '体育',
+                type: 'line',
+                stack: 'Total',
+                label: {
+                    show: true,
+                    position: 'top'
+                },
+                areaStyle: {},
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [Math.floor(1324)+241, Math.floor(1424)+441, Math.floor(1524)+1241, Math.floor(3324)+2241, Math.floor(2524)+1541, Math.floor(2624)+1641, Math.floor(2624)+1641, Math.floor(2124)+1241]
+            },
+            {
+                name: '其它',
+                type: 'line',
+                stack: 'Total',
+                label: {
+                    show: true,
+                    position: 'top'
+                },
+                areaStyle: {},
+                emphasis: {
+                    focus: 'series'
+                },
+                data: [Math.floor(1324)+841, Math.floor(1324)+741, Math.floor(4324)+2241, Math.floor(3324)+1741, Math.floor(3324)+2241, Math.floor(3324)+2041, Math.floor(3324)+2541, Math.floor(2124)+1241]
+            },
+        ]
+    };
+
+    myChart1.setOption(option1);
+
+    var JosnList = [];
+
+
+    option2 = {
+        title: {
+            text: '热搜微博词云图'
+        },
+        tooltip: {
+            show: true,
+            // formatter: (params) => {
+            //     const { name, value } = params;
+            //     return `${name}:${value}`;
+            // },
+        },
+
+        series: [
+            {
+                type: 'wordCloud',
+                //size: ['9%', '99%'],
+                sizeRange: [14, 50],
+                //textRotation: [0, 45, 90, -45],
+                rotationRange: [-45, 90],
+                shape: 'circle',
+                textPadding: 0,
+                width: '80%',
+                // 画布高
+                height: '80%',
+                autoSize: {
+                    enable: true,
+                    minSize: 6,
+                },
+                textStyle: {
+                    normal: {
+                        color: function () {
+                            return (
+                                'rgb(' +
+                                [Math.round(Math.random() * 256), Math.round(Math.random() * 256), Math.round(Math.random() * 256)].join(
+                                    ','
+                                ) +
+                                ')'
+                            );
+                        },
+                    },
+                    emphasis: {
+                        shadowBlur: 2,
+                        shadowColor: '#333',
+                    },
+                },
+                data: JosnList,
+            },
+        ],
+    };
+
+    $.ajax({
+        url: "/topsearch/query",
+        dataType: "json",
+        success: function (data) {
+            for(let i in data){
+                JosnList.push(data[i]);
+            }
+            myChart2.setOption(option2);
+        }
+    });
+
+    //JS
+    layui.use(['carousel', 'element', 'layer', 'util'], function(){
+        var element = layui.element
+            ,layer = layui.layer
+            ,carousel = layui.carousel
+            ,util = layui.util
+            ,$ = layui.$;
+
+        //头部事件
+        util.event('lay-header-event', {
+            //左侧菜单事件
+            menuLeft: function(othis){
+                layer.msg('展开左侧菜单的操作', {icon: 0});
+            }
+            ,menuRight: function(){
+                layer.open({
+                    type: 1
+                    ,content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+                    ,area: ['260px', '100%']
+                    ,offset: 'rt' //右上角
+                    ,anim: 5
+                    ,shadeClose: true
+                });
+            }
+        });
+
+        //常规轮播
+        carousel.render({
+            elem: '#test1'
+            ,arrow: 'always'
+            ,height: '200px'
+            ,width: '350px'
+        });
+
+    });
+</script>
+</body>
+</html>

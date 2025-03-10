@@ -1,0 +1,128 @@
+ <!DOCTYPE html>
+<html class="loginHtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all" />
+	<link rel="stylesheet" th:href="@{/css/public.css}" media="all" />
+	<link rel="stylesheet" media="screen" th:href="@{/css/style.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/reset.css}"/>
+	<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+<div id="particles-js">
+	<div class="login">
+		<p style="text-align:center;padding-top:50px;font-size:30px;font-style:italic;color: #000022"><strong>基于微博大数据分析系统</strong></p>
+		<div class="login-top">
+		</div>
+		<div class="login-center clearfix">
+			<div class="login-center-img"><img th:src="@{/images/login/name.png}"/></div>
+			<div class="login-center-input">
+				<input type="text" name="username" id="username" placeholder="请输入您的用户名" onfocus="this.placeholder=''"
+					   onblur="this.placeholder='请输入您的用户名'"/>
+				<div class="login-center-input-text">用户名</div>
+			</div>
+		</div>
+		<div class="login-center clearfix">
+			<div class="login-center-img"><img th:src="@{/images/login/password.png}"/></div>
+			<div class="login-center-input">
+				<input type="password" name="password" id="password" placeholder="请输入您的密码" onfocus="this.placeholder=''"
+					   onblur="this.placeholder='请输入您的密码'"/>
+				<div class="login-center-input-text">密码</div>
+			</div>
+		</div>
+		<div class="login-center clearfix">
+			<div class="login-center-img"><img th:src="@{/images/login/right.png}"/></div>
+			<div class="login-center-input">
+				<input type="text" name="code" id="code" placeholder="请输入验证码" onfocus="this.placeholder=''"
+					   onblur="this.placeholder='请输入您的验证码'"/>
+				<img th:src="@{/login/getCode}" onclick="this.src=this.src+'?'">
+				<div class="login-center-input-text">验证码</div>
+			</div>
+		</div>
+		<div class="login-button">
+			登录
+		</div>
+	</div>
+	<div class="sk-rotating-plane"></div>
+</div>
+<script th:href="@{/js/particles.min.js}" th:src="@{/js/particles.min.js}"></script>
+<script th:href="@{/js/app.js}" th:src="@{/js/app.js}"></script>
+<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+<script type="text/javascript">
+	layui.use(['layer','upload'],function() {
+		var layer = parent.layer === undefined ? layui.layer : top.layer;
+		var upload = layui.upload;
+
+		function hasClass(elem, cls) {
+			cls = cls || '';
+			if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+			return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+		}
+
+		function addClass(ele, cls) {
+			if (!hasClass(ele, cls)) {
+				ele.className = ele.className == '' ? cls : ele.className + ' ' + cls;
+			}
+		}
+
+		function removeClass(ele, cls) {
+			if (hasClass(ele, cls)) {
+				var newClass = ' ' + ele.className.replace(/[\t\r\n]/g, '') + ' ';
+				while (newClass.indexOf(' ' + cls + ' ') >= 0) {
+					newClass = newClass.replace(' ' + cls + ' ', ' ');
+				}
+				ele.className = newClass.replace(/^\s+|\s+$/g, '');
+			}
+		}
+
+
+		document.querySelector(".login-button").onclick = function () {
+
+			var username = $('#username').val();
+			var password = $('#password').val();
+			var code = $('#code').val();
+			var obj = {
+				username: username,
+				password: password,
+				code: code
+			}
+
+			if(username === ''){
+				layer.msg("用户名为空");
+			}else if(password === ''){
+				layer.msg("密码为空");
+			}else if(code === ''){
+				layer.msg("验证码为空")
+			}
+
+
+			$.ajax({
+				type: "post",
+				url: "/login/login",
+				async: 'true',
+				data: JSON.stringify(obj),
+				dataType: "json",
+				contentType: 'application/json;charset=utf-8',
+				success: function (data) {
+					if (data.code == 200) {
+						layer.msg("登录成功");
+						layer.msg(data.msg);
+						location.href = "/";
+					} else {
+						$.get("/login/getCode", function (code) {
+							$("#img").attr("src", "/login/getCode");
+						})
+						layer.msg(data.msg);
+						alert(data.msg);
+						location.reload(true);
+					}
+				}
+			})
+		}
+	})
+</script>
+</body>
+</html>
